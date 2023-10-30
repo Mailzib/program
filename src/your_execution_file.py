@@ -9,13 +9,13 @@ def execute_methods():
     while True:
         print("Choose a method to execute:")
         print("1. Search by box number")
-        print("2. Search by name (partial match)")
-        print("3. Update the date for a specific box number")
-        print("4. Filter by date and key")
+        print("2. Search by name")
+        print("3. Renew - Update the date for a specific box number")
+        print("4. Filter by dates")
         print("5. Add a new box")
-        print("6. Add a name to a box")
+        print("6. Add a name to a box - extra name for existing box")
         print("7. Delete a box by number")
-        print("8. Display info by status")
+        print("8. Display how many active customers do we have")
         print("0. Quit")
 
         choice = input("Enter the number of the method you want to execute (0 to quit): ")
