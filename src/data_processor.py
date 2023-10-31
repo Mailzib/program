@@ -306,4 +306,3 @@ def display_info_by_status():
 
     except Exception as e:
         return str(e)
-

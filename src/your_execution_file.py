@@ -42,11 +42,11 @@ def execute_methods():
         elif choice == '5':
             new_box_data = {
                 "Box number": input("Box number: "),
-                "Type": input("Type: "),
+                "Type": input("Type: can be S - M - B "),
                 "Name": input("Name: "),
                 "Date": input("Date (mm/dd/yyyy): "),
-                "Phone": input("Phone: "),
-                "Got New Key": input("Got New Key: "),
+                "Phone": input("Phone: put like 949-0000-0000 "),
+                "Got New Key": input("Got New Key: Can be Ok or leave empty"),
                 "Information": input("Information: "),
             }
             box_number = int(new_box_data["Box number"])
