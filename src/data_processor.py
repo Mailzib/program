@@ -282,19 +282,28 @@ def display_info_by_status():
         filtered_data = data[key_mask]
 
         if filtered_data.empty:
-            return "No data found with 'Got New Key' set to 'ok.'"
+            return "No data found with 'Got New Key' set to 'ok."
+
+        # Count unique 'Box numbers' in the filtered data
+        unique_box_numbers = filtered_data['Box number'].nunique()
+
+        # Count the number of 'Box numbers' for each type (s, m, b) ignoring case
+        s_count = filtered_data[filtered_data['Type'].str.lower() == 's']['Box number'].nunique()
+        m_count = filtered_data[filtered_data['Type'].str.lower() == 'm']['Box number'].nunique()
+        b_count = filtered_data[filtered_data['Type'].str.lower() == 'b']['Box number'].nunique()
 
         # Display the result with a title and using tabulate for a table-like format
         result_str = "Search result for 'Got New Key' set to 'ok'\n"
         result_str += tabulate(filtered_data, headers='keys', tablefmt='pretty', showindex=False)
 
-        # Count unique 'Box numbers' in the filtered data
-        unique_box_numbers = filtered_data['Box number'].nunique()
-
-        # Add space lines and display the unique 'Box numbers' count
-        result_str += f"\n\nTotal unique Box numbers with 'Got New Key' set to 'ok': {unique_box_numbers}"
+        # Add space lines, display the unique 'Box numbers' count, and the counts for each type
+        result_str += f"\n\nTotal Box numbers that Got New Keys: {unique_box_numbers}"
+        result_str += f"\nTotal Small Boxes: {s_count}"
+        result_str += f"\nTotal Medium Boxes: {m_count}"
+        result_str += f"\nTotal Big Boxes: {b_count}"
 
         return result_str
 
     except Exception as e:
         return str(e)
+
