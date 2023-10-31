@@ -8,7 +8,6 @@ from src.data_processor import (
 def execute_methods():
     while True:
         print("+++++++++++++++++++++     Mail ZIB Program Starting    +++++++++++++++++++")
-        print("\n" * 1)
         print("Choose a method to execute:")
         print("1. Search by box number")
         print("2. Search by name")
@@ -65,6 +64,7 @@ def execute_methods():
         print("---------------------------------- Result -----------------------------------------------------")
         print("\n" * 1)
         print(result)
+        print("\n" * 1)
         print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^- Program Ending ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
         print("\n" * 1)
 
