@@ -13,8 +13,8 @@ def execute_methods():
         print("2. Search by name")
         print("3. Renew - Update the date for a specific box number")
         print("4. Filter by dates")
-        print("5. Add a new box")
-        print("6. Add a name to a box - extra name for existing box")
+        print("5. Add a new box or update the existing Box")
+        print("6. Add a name to a box - extra name for an existing box")
         print("7. Delete a box by number")
         print("8. Display how many active customers do we have")
         print("0. Quit")
@@ -23,7 +23,11 @@ def execute_methods():
 
         if choice == '1':
             box_number = input("Enter the box number: ")
-            result = search_by_box_number(int(box_number))
+            box_number = int(box_number)
+            if 101 <= box_number <= 550:
+                result = search_by_box_number(box_number)
+            else:
+                result = "Box number must be between 101 and 550."
         elif choice == '2':
             name = input("Enter the name (partial match): ")
             result = search_by_name(name)
@@ -45,7 +49,11 @@ def execute_methods():
                 "Got New Key": input("Got New Key: "),
                 "Information": input("Information: "),
             }
-            result = add_new_box(new_box_data)
+            box_number = int(new_box_data["Box number"])
+            if 101 <= box_number <= 550:
+                result = add_new_box(new_box_data)
+            else:
+                result = "Box number must be between 101 and 550."
         elif choice == '6':
             box_number = input("Enter the box number: ")
             name = input("Enter the name to add: ")
@@ -71,3 +79,7 @@ def execute_methods():
 
 if __name__ == "__main__":
     execute_methods()
+
+
+
+
