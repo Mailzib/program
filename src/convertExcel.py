@@ -4,7 +4,7 @@ import pandas as pd
 excel_file = '/Users/myouse652/Desktop/Main.xlsx'
 
 # Replace 'output_csv_file.csv' with the desired CSV file path and name
-csv_file = '/Users/myouse652/Desktop/Main1.csv'
+csv_file = '/Users/myouse652/Desktop/MainDBNOV4.csv'
 
 # Read the Excel file into a DataFrame
 df = pd.read_excel(excel_file)

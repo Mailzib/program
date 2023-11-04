@@ -68,7 +68,10 @@ def search_by_name(name):
         return str(e)
 
 
-def update_date_by_box_number(box_number, new_date):
+from datetime import datetime, timedelta  # Corrected import statement
+
+
+def update_date_by_box_number(box_number, months_to_add):
     try:
         # Load the CSV file into a DataFrame using a comma (,) as the delimiter
         data = pd.read_csv(CSV_FILE_PATH, delimiter=',')
@@ -87,19 +90,26 @@ def update_date_by_box_number(box_number, new_date):
         if not found:
             return "Box number not found."
 
-        # Check if the entered new date is valid
-        new_date_parsed = pd.to_datetime(new_date, format='%m/%d/%Y', errors='coerce')
-        if pd.isna(new_date_parsed):
-            return "Invalid date format. Please use 'mm/dd/yyyy'."
+        # Get the existing date for the box
+        existing_date_str = data.loc[result.index, 'Date'].iloc[0]
+        existing_date = datetime.strptime(existing_date_str, '%m/%d/%Y')
+
+        # Calculate the new date by adding the specified number of months
+        new_date = existing_date + timedelta(days=30 * months_to_add)
 
         # Format the new date as "mm/dd/yyyy"
-        new_date_formatted = new_date_parsed.strftime('%m/%d/%Y')
+        new_date_formatted = new_date.strftime('%m/%d/%Y')
 
         # Update the 'Date' column with the new date
         data.loc[result.index, 'Date'] = new_date_formatted
-        data.to_csv(CSV_FILE_PATH, index=False,
-                    date_format='%m/%d/%Y')  # Save the updated DataFrame to the CSV file with date format
-        return f"Date updated for Box number {box_number} to {new_date_formatted}"
+        data.to_csv(CSV_FILE_PATH, index=False, date_format='%m/%d/%Y')
+
+        # Construct the result string with the previous and updated dates
+        result_str = f"Box number: {box_number}\n"
+        result_str += f"Existing Date: {existing_date_str}\n"
+        result_str += f"New Date: {new_date_formatted}\n"
+
+        return result_str
 
     except Exception as e:
         return str(e)

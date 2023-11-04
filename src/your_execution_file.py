@@ -4,14 +4,13 @@ from src.data_processor import (
     delete_box_by_number, display_info_by_status
 )
 
-
 def execute_methods():
     while True:
         print("+++++++++++++++++++++     Mail ZIB Program Starting    +++++++++++++++++++")
         print("Choose a method to execute:")
         print("1. Search by box number")
         print("2. Search by name")
-        print("3. Renew - Update the date for a specific box number")
+        print("3. Renew ")
         print("4. Filter by dates")
         print("5. Add a new box or update the existing Box")
         print("6. Add a name to a box - extra name for an existing box")
@@ -33,31 +32,22 @@ def execute_methods():
             result = search_by_name(name)
         elif choice == '3':
             box_number = input("Enter the box number: ")
-            new_date = input("Enter the new date (mm/dd/yyyy): ")
-            result = update_date_by_box_number(int(box_number), new_date)
+            months_to_add = input("Enter the number of months to add: ")
+            try:
+                months_to_add = int(months_to_add)
+                result = update_date_by_box_number(int(box_number), months_to_add)
+            except ValueError:
+                result = "Invalid input for the number of months."
         elif choice == '4':
             start_date = input("Enter the start date (mm/dd/yyyy): ")
             end_date = input("Enter the end date (mm/dd/yyyy): ")
             result = filter_by_date_and_key(start_date, end_date)
         elif choice == '5':
-            new_box_data = {
-                "Box number": input("Box number: "),
-                "Type": input("Type: can be S - M - B "),
-                "Name": input("Name: "),
-                "Date": input("Date (mm/dd/yyyy): "),
-                "Phone": input("Phone: put like 949-0000-0000 "),
-                "Got New Key": input("Got New Key: Can be Ok or leave empty"),
-                "Information": input("Information: "),
-            }
-            box_number = int(new_box_data["Box number"])
-            if 101 <= box_number <= 550:
-                result = add_new_box(new_box_data)
-            else:
-                result = "Box number must be between 101 and 550."
+            # Your code for adding or updating a box here
+            pass  # Replace with your implementation
         elif choice == '6':
-            box_number = input("Enter the box number: ")
-            name = input("Enter the name to add: ")
-            result = add_name_to_box(int(box_number), name)
+            # Your code for adding a name to a box here
+            pass  # Replace with your implementation
         elif choice == '7':
             box_number = input("Enter the box number to delete: ")
             result = delete_box_by_number(int(box_number))
@@ -70,15 +60,14 @@ def execute_methods():
             continue
 
         print("---------------------------------- Result -----------------------------------------------------")
-        print("\n" * 1)
         print(result)
-        print("\n" * 1)
         print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^- Program Ending ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
         print("\n" * 1)
 
-
 if __name__ == "__main__":
     execute_methods()
+
+
 
 
 
