@@ -341,6 +341,12 @@ def update_date_by_box_number(box_number, months_to_add, representative_name, pa
 
 def filter_by_date_and_key(start_date, end_date):
     try:
+        import pandas as pd
+        from datetime import datetime
+        from reportlab.lib.pagesizes import letter, landscape
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+        from reportlab.lib import colors
+
         # Load the CSV file into a DataFrame using a comma (,) as the delimiter
         data = pd.read_csv(CSV_FILE_PATH, delimiter=',')
 
@@ -387,11 +393,18 @@ def filter_by_date_and_key(start_date, end_date):
         # Calculate the count of unique "box number"
         unique_box_count = result['Box number'].nunique()
 
+        # Define the column widths
+        col_widths = [
+            60 if col in ['Box number', 'Got New Key', 'Type', 'Date', 'phone'] else
+            200 if col in ['Name', 'Information'] else
+            100 for col in result.columns
+        ]
+
         # Define the table data
         table_data = [result.columns] + result.values.tolist()
 
         # Create a table object and style
-        table = Table(table_data, colWidths=[100] * len(result.columns))
+        table = Table(table_data, colWidths=col_widths)
         table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.beige),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
@@ -1038,15 +1051,3 @@ def back_up_accounting(column_widths=None) -> str:
         import traceback
         traceback.print_exc()
         return f"Error: {str(e)}"
-
-
-
-
-
-
-
-
-
-
-
-
