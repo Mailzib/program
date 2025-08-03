@@ -2,8 +2,11 @@ from src.data_processor import (
     search_by_box_number, search_by_name, update_date_by_box_number,
     filter_by_date_and_key, add_new_box, add_name_to_box,
     delete_box_by_number, delete_row_by_name, display_info_by_status_as_pdf, back_up,
-    update_box_by_number, move_rows, add_entry_to_accounting, back_up_accounting
+    update_box_by_number, move_rows, add_entry_to_accounting, back_up_accounting,
+    run_invoice_flow  # ✅ Invoice generation now imported from data_processor
 )
+
+from src.data_processor import run_invoice_flow # ✅ Add this line
 
 
 def execute_methods():
@@ -21,6 +24,7 @@ def execute_methods():
         print("9. Update Information for existing box")
         print("10.Back up and get active Box list- PDF")
         print("11. Add entry to accounting")
+        print("12. Generate Invoice PDF")  # ✅ New option
         print("0. Quit")
 
         choice = input("Enter the number of the method you want to execute (0 to quit): ")
@@ -87,6 +91,9 @@ def execute_methods():
             result += "\n" + back_up_accounting()
         elif choice == '11':
             result = add_entry_to_accounting()
+        elif choice == '12':
+            run_invoice_flow()  # ✅ Invoice flow call
+            result = "Invoice PDF generation completed."
         elif choice == '0':
             break
         else:

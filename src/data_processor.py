@@ -2,14 +2,16 @@ import datetime
 import warnings
 
 import pandas as pd
+from info import SELLER_INFO, INVOICE_TRACKER_FILE, BUYERS, ITEM_CATALOG
 import os
 from reportlab.lib.styles import getSampleStyleSheet
 from tabulate import tabulate
 from reportlab.lib.pagesizes import letter, landscape
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
 from datetime import datetime, timedelta
 from reportlab.lib import colors, styles
 from dateutil.relativedelta import relativedelta
+
 
 CSV_FILE_PATH = 'F:/Data Base/MainDBNOV4.csv'
 ACCOUNTING_FILE_PATH = "F:/Data Base/accounting.csv"
@@ -1051,3 +1053,124 @@ def back_up_accounting(column_widths=None) -> str:
         import traceback
         traceback.print_exc()
         return f"Error: {str(e)}"
+
+def generate_invoice_pdf(buyer_name, buyer_address, buyer_phone, items, invoice_date):
+    # Validate MM/DD/YYYY format
+    try:
+        datetime.strptime(invoice_date, "%m/%d/%Y")
+    except ValueError:
+        raise ValueError("Date must be in MM/DD/YYYY format")
+
+    invoice_number = get_next_invoice_number()
+    output_dir = r"F:\Data Base\Invoices"
+    os.makedirs(output_dir, exist_ok=True)
+    file_name = os.path.join(output_dir, f"Invoice_{invoice_number}.pdf")
+
+    doc = SimpleDocTemplate(file_name, pagesize=letter,
+                            rightMargin=72, leftMargin=72,
+                            topMargin=72, bottomMargin=72)
+    styles = getSampleStyleSheet()
+    elements = []
+
+    logo_path = "F:\Data Base\IntellijIdea\mailzib\logo.jpg"  # or full path to your uploaded logo
+    if os.path.exists(logo_path):
+        logo = Image(logo_path, width=180, height=80)
+        logo.hAlign = 'CENTER'
+        elements.append(logo)
+        elements.append(Spacer(1, 20))
+
+    header = Paragraph("<b>🧾 INVOICE</b>", styles['Title'])
+    invoice_info = Paragraph(f"Invoice #: {invoice_number}<br/>Date: {invoice_date}<br/><br/>", styles['Normal'])
+    seller_info = Paragraph("<b>Seller:</b><br/>Yummy Land<br/>23016 Lake Forest Dr, Suite D, Laguna Hills, CA 92653<br/>Phone: (949) 246-6438", styles['Normal'])
+    buyer_info = Paragraph(f"<b>Buyer:</b><br/>{buyer_name}<br/>{buyer_address}<br/>Phone: {buyer_phone}", styles['Normal'])
+
+    elements.extend([header, Spacer(1, 12), invoice_info, seller_info, Spacer(1, 12), buyer_info, Spacer(1, 24)])
+
+    data = [["Description", "Qty", "Unit Price", "Total"]]
+    total = 0
+    for item_name, qty, price in items:
+        line_total = qty * price
+        total += line_total
+        data.append([item_name, str(qty), f"${price:.2f}", f"${line_total:.2f}"])
+    data.append(["", "", "Total:", f"${total:.2f}"])
+
+    table = Table(data, hAlign='CENTER')
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (1, 1), (-1, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+    ]))
+    elements.append(table)
+    elements.append(Spacer(1, 36))
+
+    thank_you = Paragraph("Thank you for your business!<br/>Yummy Land – Fresh Juice & Ice Cream Shop", styles['Normal'])
+    elements.append(thank_you)
+
+    doc.build(elements)
+    return file_name
+
+def run_invoice_flow():
+    print("Select a buyer:")
+    for num, buyer in BUYERS.items():
+        print(f"{num}. {buyer['name']}")
+
+    while True:
+        try:
+            selected = int(input("Enter buyer number: "))
+            buyer = BUYERS[selected]
+            break
+        except (ValueError, KeyError):
+            print("Invalid selection. Please try again.")
+
+    buyer_name = buyer["name"]
+    buyer_address = buyer["address"]
+    buyer_phone = buyer["phone"]
+
+    while True:
+        invoice_date = input("Enter invoice date (MM/DD/YYYY): ")
+        try:
+            datetime.strptime(invoice_date, "%m/%d/%Y")
+            break
+        except ValueError:
+            print("Invalid date format. Please enter as MM/DD/YYYY.")
+
+    print("\nAvailable Items:")
+    for idx, (item, price) in enumerate(ITEM_CATALOG, start=1):
+        print(f"{idx}. {item} - ${price:.2f}")
+
+    items = []
+    while True:
+        choice = input("Select item number to add (or 'done' to finish): ")
+        if choice.lower() == 'done':
+            break
+        try:
+            idx = int(choice) - 1
+            if 0 <= idx < len(ITEM_CATALOG):
+                qty = int(input("Enter quantity: "))
+                item_name, price = ITEM_CATALOG[idx]
+                items.append((item_name, qty, price))
+            else:
+                print("Invalid selection.")
+        except ValueError:
+            print("Invalid input.")
+
+    if not items:
+        print("No items selected. Invoice not created.")
+        return
+
+    pdf_file = generate_invoice_pdf(buyer_name, buyer_address, buyer_phone, items, invoice_date)
+    print(f"✅ Invoice generated and saved at:\n{pdf_file}")
+
+def get_next_invoice_number():
+    prefix = "YL-2025-"
+    if not os.path.exists(INVOICE_TRACKER_FILE):
+        with open(INVOICE_TRACKER_FILE, 'w') as f:
+            f.write("036")  # Starting number, adjust if needed
+    with open(INVOICE_TRACKER_FILE, 'r+') as f:
+        last_number = int(f.read())
+        new_number = last_number + 1
+        f.seek(0)
+        f.write(str(new_number).zfill(3))
+        f.truncate()
+    return f"{prefix}{str(new_number).zfill(3)}"
