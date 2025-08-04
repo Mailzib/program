@@ -1054,7 +1054,29 @@ def back_up_accounting(column_widths=None) -> str:
         traceback.print_exc()
         return f"Error: {str(e)}"
 
+from info import INVOICE_TRACKER_FILE  # make sure this line is at the top
+
+def get_next_invoice_number():
+    if not os.path.exists(INVOICE_TRACKER_FILE):
+        with open(INVOICE_TRACKER_FILE, 'w') as f:
+            f.write("1001")
+
+    with open(INVOICE_TRACKER_FILE, 'r') as f:
+        number = int(f.read().strip())
+
+    with open(INVOICE_TRACKER_FILE, 'w') as f:
+        f.write(str(number + 1))
+
+    return number
+
 def generate_invoice_pdf(buyer_name, buyer_address, buyer_phone, items, invoice_date):
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.lib import colors
+    from datetime import datetime
+    import os
+
     # Validate MM/DD/YYYY format
     try:
         datetime.strptime(invoice_date, "%m/%d/%Y")
@@ -1072,7 +1094,7 @@ def generate_invoice_pdf(buyer_name, buyer_address, buyer_phone, items, invoice_
     styles = getSampleStyleSheet()
     elements = []
 
-    logo_path = "F:\Data Base\IntellijIdea\mailzib\logo.jpg"  # or full path to your uploaded logo
+    logo_path = r"F:\Data Base\IntellijIdea\mailzib\logo.jpg"
     if os.path.exists(logo_path):
         logo = Image(logo_path, width=180, height=80)
         logo.hAlign = 'CENTER'
@@ -1086,13 +1108,19 @@ def generate_invoice_pdf(buyer_name, buyer_address, buyer_phone, items, invoice_
 
     elements.extend([header, Spacer(1, 12), invoice_info, seller_info, Spacer(1, 12), buyer_info, Spacer(1, 24)])
 
-    data = [["Description", "Qty", "Unit Price", "Total"]]
-    total = 0
-    for item_name, qty, price in items:
-        line_total = qty * price
-        total += line_total
-        data.append([item_name, str(qty), f"${price:.2f}", f"${line_total:.2f}"])
-    data.append(["", "", "Total:", f"${total:.2f}"])
+    data = [["Description", "Qty", "Unit Price", "Discount", "Total"]]
+    grand_total = 0
+    for item_name, qty, price, discount in items:
+        line_total = (price - discount) * qty
+        grand_total += line_total
+        data.append([
+            item_name,
+            str(qty),
+            f"${price:.2f}",
+            f"-${discount:.2f}" if discount > 0 else "-",
+            f"${line_total:.2f}"
+        ])
+    data.append(["", "", "", "Total:", f"${grand_total:.2f}"])
 
     table = Table(data, hAlign='CENTER')
     table.setStyle(TableStyle([
@@ -1100,6 +1128,7 @@ def generate_invoice_pdf(buyer_name, buyer_address, buyer_phone, items, invoice_
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
         ('ALIGN', (1, 1), (-1, -1), 'CENTER'),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold')
     ]))
     elements.append(table)
     elements.append(Spacer(1, 36))
@@ -1110,7 +1139,26 @@ def generate_invoice_pdf(buyer_name, buyer_address, buyer_phone, items, invoice_
     doc.build(elements)
     return file_name
 
+def execute_methods():
+    warnings.simplefilter(action='ignore', category=FutureWarning)
+    print("=== MAILZIB SYSTEM ===")
+    print("1. Generate Invoice")
+    print("2. Exit")
+
+    while True:
+        choice = input("Select an option (1-2): ").strip()
+        if choice == "1":
+            run_invoice_flow()  # Invoice flow with logo and discount support
+        elif choice == "2":
+            print("Exiting. Goodbye!")
+            break
+        else:
+            print("Invalid option. Please choose again.")
+
+
 def run_invoice_flow():
+    from datetime import datetime
+
     print("Select a buyer:")
     for num, buyer in BUYERS.items():
         print(f"{num}. {buyer['name']}")
@@ -1149,7 +1197,18 @@ def run_invoice_flow():
             if 0 <= idx < len(ITEM_CATALOG):
                 qty = int(input("Enter quantity: "))
                 item_name, price = ITEM_CATALOG[idx]
-                items.append((item_name, qty, price))
+                apply_discount = input("Apply discount to this item? (Y/N): ").strip().lower()
+                discount = 0.0
+                if apply_discount == 'y':
+                    try:
+                        discount = float(input("Enter discount per unit (For example 1.00): ").strip())
+                        if discount >= price:
+                            print("Discount must be less than the unit price.")
+                            continue
+                    except ValueError:
+                        print("Invalid discount entered. Skipping discount.")
+                        discount = 0.0
+                items.append((item_name, qty, price, discount))
             else:
                 print("Invalid selection.")
         except ValueError:
@@ -1161,16 +1220,3 @@ def run_invoice_flow():
 
     pdf_file = generate_invoice_pdf(buyer_name, buyer_address, buyer_phone, items, invoice_date)
     print(f"✅ Invoice generated and saved at:\n{pdf_file}")
-
-def get_next_invoice_number():
-    prefix = "YL-2025-"
-    if not os.path.exists(INVOICE_TRACKER_FILE):
-        with open(INVOICE_TRACKER_FILE, 'w') as f:
-            f.write("036")  # Starting number, adjust if needed
-    with open(INVOICE_TRACKER_FILE, 'r+') as f:
-        last_number = int(f.read())
-        new_number = last_number + 1
-        f.seek(0)
-        f.write(str(new_number).zfill(3))
-        f.truncate()
-    return f"{prefix}{str(new_number).zfill(3)}"
