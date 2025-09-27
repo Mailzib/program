@@ -21,6 +21,7 @@ ITEM_CATALOG = [
     ("Chocolate Ice Cream", 9.00),
     ("Faloodeh", 9.00),
     ("Pistachio Ice Cream", 9.00),
+    ("Sonati Walnut", 9.00),
     ("Mango Ice Cream", 9.00),
     ("Dubai Chocolate Ice Cream 5 oz", 3.30),
     ("lotus Ice Cream 5 oz", 3.30),
