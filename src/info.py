@@ -10,7 +10,8 @@ BUYERS = {
     1: {"name": "Jordan Market", "address": "24771 Alicia Pkwy, Laguna Hills, CA 92653", "phone": "(949) 770-3111"},
     2: {"name": "Wholesome Choice", "address": "18040 Culver Dr, Irvine, CA 92612", "phone": "(949) 551-4111"},
     3: {"name": "Cafe Naderi", "address": "18040 Culver Dr, Irvine, CA 92612", "phone": "(949) 800-8806"},
-    4: {"name": "Village Market", "address": "41 Prism, Irvine, CA 92802", "phone": "(949) 387-2000"}
+    4: {"name": "Village Market", "address": "41 Prism, Irvine, CA 92802", "phone": "(949) 387-2000"},
+    5: {"name": "Super Irvine", "address": "5331 University Dr, Irvine, CA 92612", "phone": "(949) 617-5577"}
 }
 
 ITEM_CATALOG = [
@@ -27,5 +28,9 @@ ITEM_CATALOG = [
     ("lotus Ice Cream 5 oz", 3.30),
     ("Coffe Ice Cream 5 oz", 3.30),
     ("Saffron Ice Cream 5 oz", 3.30),
-    ("Strawberry Ice Cream 5 oz", 3.30),
+    ("Strawberry Ice Cream 1 oz", 3.30),
+    ("Walnut Cream Ice Cream 1 lb", 11.5),
+    ("Saffron Pistachio Ice Cream 1 lb", 11.5),
+    ("Lotus Biscoff Ice Cream 1 lb", 11.5),
+    ("Barberry Ice Cream 1 lb", 11.5),
 ]
